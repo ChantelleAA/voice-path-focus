@@ -1,0 +1,177 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* Calming blue-purple gradient background */
+    --background: 240 20% 98%;
+    --foreground: 240 15% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 240 15% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 15% 15%;
+
+    /* Deep purple-blue primary */
+    --primary: 250 70% 55%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Soft lavender secondary */
+    --secondary: 260 45% 93%;
+    --secondary-foreground: 250 70% 40%;
+
+    --muted: 240 10% 95%;
+    --muted-foreground: 240 10% 45%;
+
+    /* Vibrant accent */
+    --accent: 280 65% 65%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 240 15% 90%;
+    --input: 240 15% 92%;
+    --ring: 250 70% 55%;
+
+    --radius: 0.75rem;
+    
+    /* Urgency colors */
+    --urgency-low: 142 76% 45%;
+    --urgency-low-foreground: 0 0% 100%;
+    
+    --urgency-medium: 38 92% 50%;
+    --urgency-medium-foreground: 0 0% 100%;
+    
+    --urgency-high: 0 72% 51%;
+    --urgency-high-foreground: 0 0% 100%;
+    
+    /* Gradients */
+    --gradient-calm: linear-gradient(135deg, hsl(250 70% 55%), hsl(280 65% 65%));
+    --gradient-subtle: linear-gradient(180deg, hsl(240 20% 98%), hsl(260 45% 96%));
+    
+    /* Shadows */
+    --shadow-soft: 0 4px 20px -2px hsl(250 70% 55% / 0.1);
+    --shadow-glow: 0 0 30px hsl(250 70% 55% / 0.15);
+    
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 240 20% 8%;
+    --foreground: 240 10% 95%;
+
+    --card: 240 15% 12%;
+    --card-foreground: 240 10% 95%;
+
+    --popover: 240 15% 12%;
+    --popover-foreground: 240 10% 95%;
+
+    --primary: 250 70% 60%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 240 20% 18%;
+    --secondary-foreground: 240 10% 95%;
+
+    --muted: 240 15% 15%;
+    --muted-foreground: 240 10% 60%;
+
+    --accent: 280 65% 65%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 240 15% 20%;
+    --input: 240 15% 18%;
+    --ring: 250 70% 60%;
+    
+    --urgency-low: 142 76% 45%;
+    --urgency-low-foreground: 0 0% 100%;
+    
+    --urgency-medium: 38 92% 50%;
+    --urgency-medium-foreground: 0 0% 100%;
+    
+    --urgency-high: 0 72% 51%;
+    --urgency-high-foreground: 0 0% 100%;
+    
+    --gradient-calm: linear-gradient(135deg, hsl(250 70% 60%), hsl(280 65% 70%));
+    --gradient-subtle: linear-gradient(180deg, hsl(240 20% 8%), hsl(240 15% 12%));
+    
+    --shadow-soft: 0 4px 20px -2px hsl(250 70% 60% / 0.2);
+    --shadow-glow: 0 0 30px hsl(250 70% 60% / 0.25);
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Enhanced ReactFlow dragging experience */
+@layer components {
+  /* Cursor feedback for nodes */
+  .react-flow__node {
+    @apply cursor-grab;
+  }
+
+  .react-flow__node.dragging {
+    @apply cursor-grabbing shadow-lg;
+    z-index: 1000;
+  }
+
+  /* Only transition shadow on hover/selection, not during drag */
+  .react-flow__node:not(.dragging) {
+    @apply transition-shadow duration-200 ease-out;
+  }
+
+  /* Enhanced selection visual */
+  .react-flow__node.selected:not(.dragging) {
+    @apply shadow-lg;
+  }
+
+  /* Smooth edge transitions but not during operations */
+  .react-flow__edge:not(.connecting) {
+    @apply transition-stroke duration-200;
+  }
+
+  .react-flow__edge.selected {
+    @apply stroke-primary;
+  }
+}
