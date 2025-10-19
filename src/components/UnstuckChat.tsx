@@ -9,6 +9,7 @@ import { Task, ChatMessage } from '@/types/task';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import unstuckAssistantPromptText from '@/prompts/unstuckAssistantPrompt.txt?raw';
+import { getFlowchartAsText, formatFlowchartAsText } from '@/lib/flowchartTextExtractor';
 
 interface UnstuckChatProps {
   task: Task;
@@ -42,6 +43,18 @@ export const UnstuckChat = ({ task, onUpdateChat, onReturnToFocus }: UnstuckChat
     setIsLoading(true);
 
     try {
+      // Get flowchart data as text for better context
+      let flowchartText = '';
+      try {
+        const flowchartData = await getFlowchartAsText(task.id);
+        if (flowchartData) {
+          flowchartText = formatFlowchartAsText(flowchartData);
+        }
+      } catch (error) {
+        console.warn('Could not fetch flowchart data:', error);
+        // Continue without flowchart data if it fails
+      }
+
       const context = {
         title: task.title,
         description: task.description,
@@ -52,11 +65,18 @@ export const UnstuckChat = ({ task, onUpdateChat, onReturnToFocus }: UnstuckChat
         progressNotes: task.progressNotes,
       };
 
-      const fullPrompt = `${unstuckAssistantPromptText}\n\nUser: ${input}`;
+      // Build enhanced prompt with flowchart data
+      let enhancedPrompt = unstuckAssistantPromptText;
+      
+      if (flowchartText) {
+        enhancedPrompt += `\n\nTASK BREAKDOWN CONTEXT:\n${flowchartText}`;
+      }
+      
+      enhancedPrompt += `\n\nUser Question: ${input}`;
 
       const { data, error } = await supabase.functions.invoke('unstuck-assistant', {
         body: {
-          userPrompt: fullPrompt,
+          userPrompt: enhancedPrompt,
           messages: updatedMessages,
           taskContext: context,
         },

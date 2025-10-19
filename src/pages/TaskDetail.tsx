@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { Task } from '@/types/task';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Focus, Map } from 'lucide-react';
+import { ArrowLeft, Focus, Map, Play, Pause, X } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { FocusMode } from '@/components/FocusMode';
 import { UnstuckChat } from '@/components/UnstuckChat';
@@ -20,8 +20,31 @@ const TaskDetail = () => {
   const [view, setView] = useState<'detail' | 'focus' | 'unstuck'>('detail');
   const [searchParams, setSearchParams] = useSearchParams();
   const [initialCheckInOpen, setInitialCheckInOpen] = useState(false);
+  const [showMinimizedTimer, setShowMinimizedTimer] = useState(false);
+  const [currentElapsedTime, setCurrentElapsedTime] = useState(0);
+  const [isTimerActive, setIsTimerActive] = useState(false);
 
-  // Load task from Supabase
+  // Update elapsed time in real-time when timer is active
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isTimerActive) {
+      interval = setInterval(() => {
+        setCurrentElapsedTime(prev => {
+          const newTime = prev + 1;
+          // Also update the task focus time
+          handleUpdateFocusTime(newTime);
+          return newTime;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [isTimerActive]);
+
+  // Add debug logging
+  useEffect(() => {
+    console.log('showMinimizedTimer:', showMinimizedTimer);
+  }, [showMinimizedTimer]);
+
   useEffect(() => {
     const loadTask = async () => {
       setLoading(true);
@@ -113,9 +136,19 @@ const TaskDetail = () => {
     return (
       <FocusMode
         task={task}
-        onExitFocus={() => setView('detail')}
+        onExitFocus={() => {
+          setView('detail');
+          // Don't clear minimized timer here - it should stay visible
+        }}
         onOpenUnstuck={() => setView('unstuck')}
         onUpdateFocusTime={handleUpdateFocusTime}
+        onMinimize={() => {
+          console.log('onMinimize called!');
+          setShowMinimizedTimer(true);
+        }}
+        externalElapsedTime={currentElapsedTime}
+        externalIsActive={isTimerActive}
+        onTimerActiveChange={setIsTimerActive}
         initialCheckInOpen={initialCheckInOpen}
       />
     );
@@ -135,6 +168,46 @@ const TaskDetail = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20">
+      {/* Minimized Timer Overlay - shown when focus is minimized */}
+      {showMinimizedTimer && (
+        <div className="fixed top-4 right-4 z-50">
+          <div className="bg-card border border-border rounded-lg p-2.5 px-4 flex items-center gap-3 shadow-lg">
+            <div 
+              className="font-mono font-semibold text-base cursor-pointer hover:text-primary transition-colors"
+              onClick={() => {
+                setShowMinimizedTimer(false);
+                setView('focus');
+              }}
+              title="Click to expand focus mode"
+            >
+              {/* Format currentElapsedTime as HH:MM:SS */}
+              {new Date(currentElapsedTime * 1000).toISOString().substr(11, 8)}
+            </div>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => setIsTimerActive(prev => !prev)}
+              className="h-8 w-8 p-0"
+              aria-label={isTimerActive ? 'Pause timer' : 'Start timer'}
+            >
+              {isTimerActive ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+            </Button>
+            <Button 
+              size="sm" 
+              variant="ghost" 
+              className="h-8 w-8 p-0 hover:bg-destructive hover:text-destructive-foreground"
+              onClick={() => {
+                setShowMinimizedTimer(false);
+                setIsTimerActive(false);
+              }}
+              aria-label="Close timer"
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      )}
+
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">

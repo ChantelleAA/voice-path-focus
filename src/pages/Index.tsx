@@ -377,7 +377,7 @@ const Index = () => {
             <p className="text-lg text-muted-foreground">No tasks yet. Create your first task to get started!</p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-6">
             <div className="text-sm font-semibold text-muted-foreground mb-4">
               {sortedTasks.length} {sortedTasks.length === 1 ? 'task' : 'tasks'}
             </div>

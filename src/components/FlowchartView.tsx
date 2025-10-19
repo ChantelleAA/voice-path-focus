@@ -664,9 +664,12 @@ Based on the above context, please provide additional helpful details and contex
 
       const responseText = await sendPromptToLLM(masterPrompt);
       
+      // Update the description field with the LLM response
+      setDescription(responseText);
+      
       toast({
         title: 'Success',
-        description: 'Context suggestion: ' + responseText.split('\n')[0],
+        description: 'Context has been added to the description field',
       });
       setContextText('');
     } catch (err) {
@@ -678,7 +681,7 @@ Based on the above context, please provide additional helpful details and contex
     } finally {
       setIsSubmittingContext(false);
     }
-  }, [contextText, label, description, toast, sendPromptToLLM]);
+  }, [contextText, label, description, toast, sendPromptToLLM, setDescription]);
 
   return (
     <div className="space-y-4 pt-2">
